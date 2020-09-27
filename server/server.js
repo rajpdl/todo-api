@@ -7,14 +7,12 @@ const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb');
 const _ = require('lodash');
 const { isBoolean } = require('lodash');
-const cors = require('cors');
 
 
 var app = express();
 var port = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
-app.use(cors());
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
