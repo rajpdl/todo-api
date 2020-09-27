@@ -7,17 +7,27 @@ const bodyParser = require('body-parser');
 const { ObjectID } = require('mongodb');
 const _ = require('lodash');
 const { isBoolean } = require('lodash');
+const cors = require('cors');
 
 
 var app = express();
 var port = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
+app.use(cors());
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Header", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.setHeader("Access-Control-Allow-Methods", "*");
+    res.setHeader("Access-Control-Allow-Credentials", true);
     next();
-})
+});
+app.use(express.static('public'));
+
+
+app.get('/', (req, res) =>{
+    res.send('index.html')
+});
 
 app.post('/todo',(req, res) => {
    var text = req.body.text;
@@ -28,6 +38,7 @@ app.post('/todo',(req, res) => {
 //    }).catch( error => {
 //     res.status(404).send('Unable to connect to the server post method');
 //    });
+    console.log('Todo post is called...', new Date().getTime());
    var todo = new Todo({
        text: text
    });
@@ -82,7 +93,7 @@ app.delete('/todo/:id', (req, res) => {
     });
 });
 
-app.patch('/todo/:id', (req, res) => {
+app.post('/todo/:id', (req, res) => {
     var id = req.params.id;
     if(!ObjectID.isValid(id)) {
         return res.status(400).send('Id is invalid');
@@ -92,6 +103,8 @@ app.patch('/todo/:id', (req, res) => {
 
     if( _.isBoolean(body.completed) && body.completed){
         body.completedAt = new Date().getTime();
+    }else{
+        body.completedAt = null;
     }
     Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then(todo => {
         console.log(body);
