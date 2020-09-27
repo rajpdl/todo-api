@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
 
-var mongodb_url = process.env.MONGODB_URL || 'mongodb://localhost:27017/TodoApp';
-
-mongoose.connect(mongodb_url,{
+mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost:27017/TodoApp',{
     useNewUrlParser: true,
     useUnifiedTopology: true
+})
+.then((data) => {
+    console.log("it is workign");
+})
+.catch(err => {
+    console.log('Error occurred during ', err);
 });
-
-console.log(mongodb_url);
 
 module.exports = {mongoose};
