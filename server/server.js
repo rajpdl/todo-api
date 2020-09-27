@@ -8,6 +8,8 @@ const { ObjectID } = require('mongodb');
 const _ = require('lodash');
 const { isBoolean } = require('lodash');
 
+// mongodb+srv://mongodb_user:@heroku.zjijf.mongodb.net/<dbname>?retryWrites=true&w=majority
+// mongodb+srv://mongodb_user:mongodb7252@@heroku.zjijf.mongodb.net/TodoAppDB?retryWrites=true&w=majority
 
 var app = express();
 var port = process.env.PORT || 8080;
