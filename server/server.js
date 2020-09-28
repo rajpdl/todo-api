@@ -1,15 +1,13 @@
-const { mongo } = require('mongoose');
-const {mongoose} = require('./db/mongoose');
-const {Todo} = require('./models/Todo');
+// const { mongo } = require('mongoose');
+// const {mongoose} = require('./db/mongoose');
+const { Todo } = require('./db/sequelize');
+// const {Todo} = require('./models/Todo');
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const { ObjectID } = require('mongodb');
+// const { ObjectID } = require('mongodb');
 const _ = require('lodash');
 const { isBoolean } = require('lodash');
-
-// mongodb+srv://mongodb_user:@heroku.zjijf.mongodb.net/<dbname>?retryWrites=true&w=majority
-// mongodb+srv://mongodb_user:mongodb7252@@heroku.zjijf.mongodb.net/TodoAppDB?retryWrites=true&w=majority
 
 var app = express();
 var port = process.env.PORT || 8080;
@@ -38,66 +36,79 @@ app.post('/todo',(req, res) => {
 //    }).catch( error => {
 //     res.status(404).send('Unable to connect to the server post method');
 //    });
-    console.log('Todo post is called...', new Date().getTime());
-   var todo = new Todo({
-       text: text
-   });
-   todo.save().then(todo => {
-    res.send(todo);
-   }).catch(error => {
-    res.status(404).send('Connection is not established');
-   });
+    // console.log('Todo post is called...', new Date().getTime());
+//    var todo = new Todo({
+//        text: text
+//    });
+//    todo.save().then(todo => {
+//     res.send(todo);
+//    }).catch(error => {
+//     res.status(404).send('Connection is not established');
+//    });
+    var text = req.body.text;
+    Todo.create({
+        text: text
+    }).then(user => res.send(user))
+        .catch(error => res.status(404).send('Error occurred.'));
+
 });
 
 app.get('/todos', (req, res) => {
-    Todo.find().then( todos => 
-        res.send(todos)
-    ).catch(error => {
-        res.status(404).send('Unable to connect to the server');
-    })
+    // Todo.find().then( todos => 
+    //     res.send(todos)
+    // ).catch(error => {
+    //     res.status(404).send('Unable to connect to the server');
+    // })
+    Todo.findAll().then(response => res.send(response)).catch(error => res.sendStatus(404));
 });
 
 app.get('/todo/:id', (req, res) => {
     var id = req.params.id;
 
-    if(!ObjectID.isValid(id)) {
-        return res.status(400).send('Id is invalid');
-    }
-    Todo.findById(id).then(
-        todo => {
-            if(!todo) {
-                return res.status(400).send("Not returning anything");
-            } 
-            res.send(todo);
-        }
-    ).catch(error => {
-        res.status(404).send('Unable to connect to the server');
-    });
+    // if(!ObjectID.isValid(id)) {
+    //     return res.status(400).send('Id is invalid');
+    // }
+    // Todo.findById(id).then(
+    //     todo => {
+    //         if(!todo) {
+    //             return res.status(400).send("Not returning anything");
+    //         } 
+    //         res.send(todo);
+    //     }
+    // ).catch(error => {
+    //     res.status(404).send('Unable to connect to the server');
+    // });
+    Todo.findByPk(id).then(user => user? res.send(user): res.sendStatus(404)).catch(err => res.status(404).send(err));
 });
 
 app.delete('/todo/:id', (req, res) => {
     var id = req.params.id;
 
-    if(!ObjectID.isValid(id)) {
-        return res.status(400).send('Id is invalid');
-    }
-    Todo.findByIdAndDelete(id).then(
-        todo => {
-            if(!todo) {
-                return res.status(400).send("Not returning anything");
-            } 
-            res.send(todo);
+    // if(!ObjectID.isValid(id)) {
+    //     return res.status(400).send('Id is invalid');
+    // }
+    // Todo.findByIdAndDelete(id).then(
+    //     todo => {
+    //         if(!todo) {
+    //             return res.status(400).send("Not returning anything");
+    //         } 
+    //         res.send(todo);
+    //     }
+    // ).catch(error => {
+    //     res.status(404).send('Unable to connect to the server');
+    // });
+    Todo.destroy({
+        where: {
+            id: id
         }
-    ).catch(error => {
-        res.status(404).send('Unable to connect to the server');
-    });
+    }).then(response => res.sendStatus(response == 1? 200 : 400)).catch(error => res.send(error));
 });
 
 app.post('/todo/:id', (req, res) => {
     var id = req.params.id;
-    if(!ObjectID.isValid(id)) {
-        return res.status(400).send('Id is invalid');
-    }
+    // if(!ObjectID.isValid(id)) {
+    //     return res.status(400).send('Id is invalid');
+    // }
 
     var body = _.pick(req.body, ['text', 'completed', "completedAt"]);
 
@@ -106,12 +117,20 @@ app.post('/todo/:id', (req, res) => {
     }else{
         body.completedAt = null;
     }
-    Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then(todo => {
-        console.log(body);
-        res.send(todo);
-    }).catch(error => {
-        res.status(404).send('Unable to connect to the network.');
-    })
+    // Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then(todo => {
+    //     console.log(body);
+    //     res.send(todo);
+    // }).catch(error => {
+    //     res.status(404).send('Unable to connect to the network.');
+    // })
+    console.log(body);
+    Todo.update(body,{
+        returning: true,
+        where: {
+            id: id
+        }
+    }).then(user => res.send(user)).catch(error => res.status(404));
+    // res.send(body);
 
 })
 

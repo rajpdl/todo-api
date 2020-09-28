@@ -1,18 +1,35 @@
-const mongoose = require('mongoose');
+const { sequelize, DataTypes } = require('sequelize');
 
-var Todo = mongoose.model('Todo', {
+// const mongoose = require('mongoose');
+
+// var Todo = mongoose.model('Todo', {
+//     text: {
+//         type: String,
+//         required: true,
+//     },
+//     completed: {
+//         type: Boolean,
+//         default: false,
+//         minlength: 4
+//     },
+//     completedAt : {
+//         type: Number,
+//         default: null
+//     }
+// });
+
+var Todo = sequelize.define('Todo', {
     text: {
-        type: String,
-        required: true,
+        type: DataTypes.STRING,
+        required: true
     },
     completed: {
-        type: Boolean,
-        default: false,
-        minlength: 4
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
     },
-    completedAt : {
-        type: Number,
-        default: null
+    completedAt: {
+        type: DataTypes.NUMBER,
+        defaultValue: null
     }
 });
 
