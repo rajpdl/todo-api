@@ -46,6 +46,9 @@ app.post('/todo',(req, res) => {
 //     res.status(404).send('Connection is not established');
 //    });
     var text = req.body.text;
+    if(text === "") {
+        res.status(400).send('Please Enter Something');
+    }
     Todo.create({
         text: text
     }).then(user => res.send(user))
