@@ -113,7 +113,7 @@ app.post('/todo/:id', (req, res) => {
     var body = _.pick(req.body, ['text', 'completed', "completedAt"]);
 
     if( _.isBoolean(body.completed) && body.completed){
-        body.completedAt = new Date().getTime();
+        body.completedAt = new Date().getMilliseconds();
     }else{
         body.completedAt = null;
     }
@@ -124,12 +124,14 @@ app.post('/todo/:id', (req, res) => {
     //     res.status(404).send('Unable to connect to the network.');
     // })
     console.log(body);
-    Todo.update(body,{
-        returning: true,
-        where: {
-            id: id
-        }
-    }).then(user => res.send(user)).catch(error => res.status(404));
+    (async() => {
+        await Todo.update(body,{
+            where: {
+                id: id
+            }
+        });
+    })();
+        res.send("It is finished");
     // res.send(body);
 
 })
